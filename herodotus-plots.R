@@ -39,6 +39,33 @@ theme_set(
      y = expression(paste(F["app"]/g, " (kg)"))
    )) 
 
+# Potential for adding labels ----
+highlight_point <- function(gg, data, value){
+  df1 <- data |> 
+    filter(delta_cm %in% value)
+  
+  gg +
+    geom_segment(data = df1, aes(
+      x = delta_cm, xend = delta_cm,
+      y = -Inf, yend = f_app_over_g_kg),
+      linetype = "dashed") +
+    geom_segment(data = df1, aes(
+      x = -Inf, xend = delta_cm,
+      y = f_app_over_g_kg, yend = f_app_over_g_kg),
+      linetype = "dashed") +
+    geom_point(data = df1, size = 5, color = "#EA7580", alpha = 0.5) + 
+    geom_label(data = df1,
+      aes(x = delta_cm, y = f_app_over_g_kg, 
+          label = str_c("x: ", delta_cm, "\n", 
+                        "y: ", f_app_over_g_kg)),
+      vjust = -0.5)
+}
+
+gg1 |> 
+  highlight_point(data = df, value = 30)
+
+# Now back to regularly scheduled programming ----
+
 ggsave("plot1.png", plot = gg1, 
        height = 1080, width = 1920, units = "px",
        type = "cairo")
